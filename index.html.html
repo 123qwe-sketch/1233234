@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>云间心语 · 教师回收站 | 525心理云展</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef9ff 0%, #f9f3f7 100%);
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', 'Noto Sans', sans-serif;
+            color: #2c3e4e;
+            padding: 2rem 1.5rem;
+        }
+
+        body::before {
+            content: "☁️";
+            font-size: 180px;
+            position: fixed;
+            bottom: -30px;
+            left: -60px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: "☁️☁️";
+            font-size: 240px;
+            position: fixed;
+            top: 20px;
+            right: -80px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 主标题区 */
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: rgba(255,255,240,0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 80px;
+            padding: 1.5rem 1rem;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, #5f9bc2, #b6d0e0, #f7c6d9);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            margin-top: 8px;
+            color: #5e7b8c;
+        }
+
+        /* 教师入口按钮 */
+        .teacher-entry {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+        .teacher-btn {
+            background: #e0d3dd;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #4e3e48;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: 0.2s;
+        }
+        .teacher-btn:hover {
+            background: #d3c0cc;
+        }
+
+        /* 教师管理面板 */
+        .admin-panel {
+            background: rgba(250, 245, 240, 0.96);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #ffefdf;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px dashed #decbbd;
+            padding-bottom: 10px;
+            margin-bottom: 1rem;
+        }
+        .admin-header h3 {
+            color: #7b5a6e;
+        }
+        .admin-tabs {
+            display: flex;
+            gap: 12px;
+        }
+        .tab-btn {
+            background: #ede0d8;
+            border: none;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #c7b0a2;
+            color: white;
+        }
+        .admin-list {
+            max-height: 380px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        .admin-item {
+            background: #fffcf7;
+            border-radius: 32px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-left: 6px solid #bdd9e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .admin-item-info {
+            flex: 3;
+        }
+        .admin-item-meta {
+            font-size: 0.7rem;
+            color: #a27e8e;
+            margin-bottom: 5px;
+        }
+        .admin-item-content {
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .admin-item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .reclaim-btn {
+            background: #fbc4c4;
+            color: #a04b4b;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+        }
+        .restore-btn {
+            background: #c7e0cb;
+            color: #3a6b3e;
+        }
+        .export-btn {
+            background: #cbdbe6;
+            margin-right: 8px;
+        }
+        .batch-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        /* 原有的云朵卡片样式保留 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .cloud-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(6px);
+            border-radius: 48px 48px 48px 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+            padding: 1.4rem 1.6rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,240,0.7);
+        }
+        .card-header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 1rem;
+            border-left: 5px solid #9ac2cf;
+            padding-left: 14px;
+        }
+        .card-header h2 {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: #446d7c;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 40px;
+            border: 1px solid #d4e2e8;
+            background: #fffcf7;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        button {
+            background: #bdd9e6;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: #f3cfdd;
+            color: #9e5f78;
+        }
+        .cloud-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .cloud-item {
+            background: rgba(250, 252, 250, 0.9);
+            border-radius: 32px;
+            padding: 1rem;
+            border: 1px solid #fff6ed;
+        }
+        .item-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #7c98a3;
+            margin-bottom: 6px;
+        }
+        .content-text {
+            font-size: 0.95rem;
+            margin: 8px 0;
+            color: #2c4b5a;
+            word-break: break-word;
+        }
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .like-btn {
+            background: #f0f2f0;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        .reply-area {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed #d9e2e8;
+        }
+        .reply-form {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        .reply-list {
+            background: #faf5ef;
+            border-radius: 24px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #8fb1c0;
+        }
+        @media (max-width: 900px) {
+            .dashboard, .two-columns {
+                grid-template-columns: 1fr;
+            }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="teacher-entry">
+        <button id="teacherPanelBtn" class="teacher-btn">🔐 心理教师 · 回收管理</button>
+    </div>
+
+    <!-- 教师管理面板，初始隐藏 -->
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+        <div class="admin-header">
+            <h3>📥 留言回收工作站 <span style="font-size:0.7rem;">(已回收内容将从前台移除)</span></h3>
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="unreclaimed">未回收留言</button>
+                <button class="tab-btn" data-tab="reclaimed">已回收存档</button>
+            </div>
+        </div>
+        <div id="adminListContainer" class="admin-list">
+            <!-- 动态渲染未回收/已回收条目 -->
+        </div>
+        <div class="batch-bar">
+            <button id="exportAllBtn" class="export-btn">📎 导出全部留言 (CSV)</button>
+            <button id="batchReclaimBtn" class="reclaim-btn" style="background:#eecaaf;">🗑️ 批量回收所选</button>
+        </div>
+        <p style="font-size:0.7rem; margin-top:8px;">💡 提示：回收后留言仅教师可见，并可随时恢复。</p>
+    </div>
+
+    <!-- 原有前台展示区 -->
+    <div class="hero">
+        <h1>☁️ 云间心语 · 柔软对话空间 ☁️</h1>
+        <p>每片云都承载一份真实的声音，每一次回应都是一次无声的拥抱</p>
+        <div class="badge">✨ 匿名 · 温柔 · 彼此照亮 ✨</div>
+    </div>
+
+    <div class="dashboard">
+        <!-- 问题云朵区 -->
+        <div class="cloud-card">
+            <div class="card-header"><h2>📬 问题云朵区</h2><span>成长·学业·人际·亲子</span></div>
+            <div class="form-group">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <select id="questionRole" style="width: auto; flex:1;"><option value="家长">👪 家长</option><option value="老师">🍎 老师</option><option value="学生">📖 学生</option><option value="匿名">☁️ 匿名</option></select>
+                    <textarea id="questionContent" rows="2" placeholder="写下你的困惑..." style="flex:3;"></textarea>
+                    <button id="submitQuestionBtn" class="btn-primary">📨 飘出云朵</button>
+                </div>
+            </div>
+            <div class="cloud-list" id="questionListContainer"></div>
+        </div>
+
+        <div class="two-columns" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="cloud-card">
+                <div class="card-header"><h2>💬 回应云朵区</h2><span>无声拥抱</span></div>
+                <div class="form-group">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <select id="replyRole" style="width: auto; flex:1;"><option value="家长">👪 家长</option><option value="老师">🍎 老师</option><option value="学生">📖 学生</option><option value="匿名">☁️ 匿名</option></select>
+                        <textarea id="replyContent" rows="2" placeholder="写一句鼓励的话..." style="flex:3;"></textarea>
+                        <button id="submitStandaloneReplyBtn" class="btn-primary">🌸 放飞回应</button>
+                    </div>
+                </div>
+                <div class="cloud-list" id="standaloneReplyList" style="max-height: 280px;"></div>
+            </div>
+            <div class="cloud-card">
+                <div class="card-header"><h2>🌧️ 情绪释放云朵</h2><span>定期回收</span></div>
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <textarea id="worryContent" rows="1" placeholder="此刻的烦恼..." style="flex:3;"></textarea>
+                    <button id="submitWorryBtn" class="btn-primary">🍃 释放</button>
+                </div>
+                <div class="cloud-list" id="worryListContainer" style="max-height: 220px;"></div>
+            </div>
+        </div>
+
+        <div class="cloud-card full-width">
+            <div class="card-header"><h2>❤️ 暖心点赞区 · 高赞回响</h2></div>
+            <div id="hotContentArea" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
+        </div>
+    </div>
+    <footer>🌟 每一朵云都温柔可栖 — 心理老师定期回收归档，延续关怀 🌟</footer>
+</div>
+
+<script>
+    // ---------- 存储KEY ----------
+    const STORAGE_KEYS = {
+        problems: 'cloud_problems_v2',
+        standaloneReplies: 'cloud_standalone_replies_v2',
+        worries: 'cloud_worries_v2'
+    };
+
+    // ---------- 回收标志扩展 ----------
+    // 问题、独立回应、烦恼均增加 reclaimed: false/true
+    let problems = [];
+    let standaloneReplies = [];
+    let worries = [];
+
+    // 初始化默认数据（带回收标志）
+    const defaultProblems = [
+        { id: 'p1', role: '家长', content: '孩子沉迷手机，沟通总以吵架收场，我该怎么表达关心？', likes: 15, replies: [{ rid: 'r1', role: '老师', content: '试着先倾听三分钟不评价，用“我感受到…”代替指责。', likes: 7 }, { rid: 'r2', role: '家长', content: '陪他一起定规则，每周家庭游戏夜。', likes: 4 }], reclaimed: false },
+        { id: 'p2', role: '老师', content: '班上学生考前焦虑明显，如何帮助他们缓解紧张？', likes: 22, replies: [{ rid: 'r3', role: '老师', content: '正念呼吸小练习，在课前带他们做2分钟。', likes: 12 }, { rid: 'r4', role: '学生', content: '希望老师多鼓励，不要只盯着分数。', likes: 9 }], reclaimed: false },
+        { id: 'p3', role: '家长', content: '青春期孩子拒绝和我说话，放学就锁门，很失落。', likes: 18, replies: [{ rid: 'r5', role: '匿名', content: '写一封小信塞进门缝，告诉他你爱他。', likes: 11 }], reclaimed: false }
+    ];
+    const defaultStandaloneReplies = [
+        { id: 'sr1', role: '老师', content: '每个孩子都是一朵晚开的花，请耐心等春天。', likes: 24, reclaimed: false },
+        { id: 'sr2', role: '家长', content: '放下焦虑，先成为快乐的自己，才能照亮孩子。', likes: 19, reclaimed: false },
+        { id: 'sr3', role: '学生', content: '其实爸妈只要陪着我，我就很安心。', likes: 14, reclaimed: false }
+    ];
+    const defaultWorries = [
+        { id: 'w1', content: '害怕让父母失望，每次考试前都失眠。', likes: 8, reclaimed: false },
+        { id: 'w2', content: '和青春期的儿子冷战两周了，心里难受。', likes: 5, reclaimed: false },
+        { id: 'w3', content: '工作压力大到没时间陪孩子...愧疚', likes: 11, reclaimed: false }
+    ];
+
+    function loadData() {
+        const storedProblems = localStorage.getItem(STORAGE_KEYS.problems);
+        problems = storedProblems ? JSON.parse(storedProblems) : defaultProblems;
+        const storedReplies = localStorage.getItem(STORAGE_KEYS.standaloneReplies);
+        standaloneReplies = storedReplies ? JSON.parse(storedReplies) : defaultStandaloneReplies;
+        const storedWorries = localStorage.getItem(STORAGE_KEYS.worries);
+        worries = storedWorries ? JSON.parse(storedWorries) : defaultWorries;
+    }
+    function saveAll() {
+        localStorage.setItem(STORAGE_KEYS.problems, JSON.stringify(problems));
+        localStorage.setItem(STORAGE_KEYS.standaloneReplies, JSON.stringify(standaloneReplies));
+        localStorage.setItem(STORAGE_KEYS.worries, JSON.stringify(worries));
+    }
+
+    function genId(prefix) { return prefix + Date.now() + '-' + Math.random().toString(36).substr(2, 6); }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // ---------- 前台渲染 (过滤 reclaimed = false) ----------
+    function renderProblems() {
+        const container = document.getElementById('questionListContainer');
+        if(!container) return;
+        const activeProblems = problems.filter(p => !p.reclaimed);
+        if(activeProblems.length === 0) { container.innerHTML = '<div class="cloud-item">✨ 暂无疑问云朵，欢迎投递~</div>'; return; }
+        container.innerHTML = activeProblems.map(prob => `
+            <div class="cloud-item" data-problem-id="${prob.id}">
+                <div class="item-head"><span class="role-tag">${prob.role === '匿名' ? '☁️ 匿名' : prob.role}</span><span>❤️ ${prob.likes || 0}</span></div>
+                <div class="content-text">${escapeHtml(prob.content)}</div>
+                <div class="action-bar"><button class="like-btn" data-type="problem" data-id="${prob.id}">👍 点赞 (${prob.likes || 0})</button><button class="toggle-reply-btn" data-id="${prob.id}">💬 回应</button></div>
+                <div class="reply-area" id="replyArea-${prob.id}" style="display:none;">
+                    <div class="reply-form"><select class="reply-role-select"><option value="家长">家长</option><option value="老师">老师</option><option value="学生">学生</option><option value="匿名">匿名</option></select><input type="text" class="reply-input" placeholder="写一段回应..."><button class="submit-reply-btn" data-id="${prob.id}">发送</button></div>
+                    <div class="reply-list">${prob.replies && prob.replies.length ? prob.replies.map(rep => `<div class="single-reply"><span class="role-tag">${rep.role}</span> ${escapeHtml(rep.content)} <button class="like-btn small-like" data-type="reply" data-problemId="${prob.id}" data-replyId="${rep.rid}">👍 ${rep.likes || 0}</button></div>`).join('') : '<div>暂无回应，为ta写下一句温暖吧～</div>'}</div>
+                </div>
+            </div>
+        `).join('');
+        attachReplyEvents();
+    }
+    function attachReplyEvents() {
+        document.querySelectorAll('.toggle-reply-btn').forEach(btn => btn.onclick = (e) => { const id = btn.getAttribute('data-id'); const area = document.getElementById(`replyArea-${id}`); if(area) area.style.display = area.style.display === 'none' ? 'block' : 'none'; });
+        document.querySelectorAll('.submit-reply-btn').forEach(btn => btn.onclick = (e) => { const probId = btn.getAttribute('data-id'); const container = document.querySelector(`.cloud-item[data-problem-id="${probId}"]`); if(!container) return; const role = container.querySelector('.reply-role-select').value; const input = container.querySelector('.reply-input'); const content = input.value.trim(); if(!content) { alert('请写下回应'); return; } const problem = problems.find(p => p.id === probId); if(problem && !problem.reclaimed) { const newReply = { rid: genId('rep_'), role: role, content: content, likes: 0 }; if(!problem.replies) problem.replies = []; problem.replies.push(newReply); saveAll(); renderProblems(); renderHotContent(); renderAdminPanel(currentAdminTab); } input.value = ''; });
+    }
+    function renderStandaloneReplies() {
+        const container = document.getElementById('standaloneReplyList');
+        if(!container) return;
+        const active = standaloneReplies.filter(r => !r.reclaimed);
+        if(active.length===0){ container.innerHTML='<div class="cloud-item">💭 暂无独立回应，来成为温暖的人吧</div>'; return; }
+        container.innerHTML = active.map(rep => `<div class="cloud-item"><div class="item-head"><span>${rep.role}</span><span>❤️ ${rep.likes}</span></div><div class="content-text">${escapeHtml(rep.content)}</div><button class="like-btn" data-type="standaloneReply" data-id="${rep.id}">👍 点赞 (${rep.likes})</button></div>`).join('');
+    }
+    function renderWorries() {
+        const container = document.getElementById('worryListContainer');
+        if(!container) return;
+        const active = worries.filter(w => !w.reclaimed);
+        if(active.length===0){ container.innerHTML='<div class="cloud-item">🍃 没有烦恼云，愿心轻盈。</div>'; return; }
+        container.innerHTML = active.map(w => `<div class="cloud-item"><div class="item-head"><span>🌧️ 匿名心事</span><span>❤️ ${w.likes}</span></div><div class="content-text">${escapeHtml(w.content)}</div><button class="like-btn" data-type="worry" data-id="${w.id}">👍 抚慰点赞 (${w.likes})</button></div>`).join('');
+    }
+    function renderHotContent() {
+        const hotContainer = document.getElementById('hotContentArea');
+        let allItems = [];
+        problems.filter(p=>!p.reclaimed).forEach(p=>allItems.push({ type:'💬困惑', text:p.content, likes:p.likes, role:p.role }));
+        standaloneReplies.filter(r=>!r.reclaimed).forEach(r=>allItems.push({ type:'🌸回应', text:r.content, likes:r.likes, role:r.role }));
+        worries.filter(w=>!w.reclaimed).forEach(w=>allItems.push({ type:'🌱情绪释放', text:w.content, likes:w.likes, role:'匿名' }));
+        allItems.sort((a,b)=>b.likes-a.likes);
+        const top5 = allItems.slice(0,5);
+        hotContainer.innerHTML = top5.length? top5.map(item=>`<div style="background:#fffcf0; border-radius:48px; padding:10px 16px;"><div style="font-size:0.7rem;">${item.type} · ${item.role}</div><div>${escapeHtml(item.text.length>40?item.text.slice(0,40)+'…':item.text)}</div><div>❤️ ${item.likes}</div></div>`).join('') : '<div>✨ 点赞传递温暖，高赞将展示于此 ✨</div>';
+    }
+
+    // 点赞处理
+    function handleLike(target) {
+        const type = target.getAttribute('data-type'), id = target.getAttribute('data-id');
+        if(type === 'problem') { let p = problems.find(p=>p.id===id); if(p && !p.reclaimed) { p.likes = (p.likes||0)+1; saveAll(); renderProblems(); renderHotContent(); renderAdminPanel(currentAdminTab); } }
+        else if(type === 'standaloneReply') { let r = standaloneReplies.find(r=>r.id===id); if(r && !r.reclaimed) { r.likes = (r.likes||0)+1; saveAll(); renderStandaloneReplies(); renderHotContent(); renderAdminPanel(currentAdminTab); } }
+        else if(type === 'worry') { let w = worries.find(w=>w.id===id); if(w && !w.reclaimed) { w.likes = (w.likes||0)+1; saveAll(); renderWorries(); renderHotContent(); renderAdminPanel(currentAdminTab); } }
+        else if(type === 'reply') { let probId = target.getAttribute('data-problemId'), replyId = target.getAttribute('data-replyId'); let prob = problems.find(p=>p.id===probId); if(prob && !prob.reclaimed && prob.replies) { let reply = prob.replies.find(r=>r.rid===replyId); if(reply) { reply.likes = (reply.likes||0)+1; saveAll(); renderProblems(); renderHotContent(); renderAdminPanel(currentAdminTab); } } }
+    }
+    document.addEventListener('click', function(e){ let btn = e.target.closest('.like-btn'); if(btn) { e.preventDefault(); handleLike(btn); } });
+
+    // 新增数据 (未回收)
+    function addQuestion(role, content) { if(!content.trim()) return false; let newProb = { id: genId('prob_'), role, content: content.trim(), likes:0, replies:[], reclaimed:false }; problems.unshift(newProb); saveAll(); renderProblems(); renderHotContent(); renderAdminPanel(currentAdminTab); return true; }
+    function addStandaloneReply(role, content) { if(!content.trim()) return false; let newReply = { id: genId('sr_'), role, content: content.trim(), likes:0, reclaimed:false }; standaloneReplies.unshift(newReply); saveAll(); renderStandaloneReplies(); renderHotContent(); renderAdminPanel(currentAdminTab); return true; }
+    function addWorry(content) { if(!content.trim()) return false; let newWorry = { id: genId('wr_'), content: content.trim(), likes:0, reclaimed:false }; worries.unshift(newWorry); saveAll(); renderWorries(); renderHotContent(); renderAdminPanel(currentAdminTab); return true; }
+
+    // ---------- 教师回收面板 ----------
+    let currentAdminTab = 'unreclaimed'; // unreclaimed / reclaimed
+    let selectedItems = new Set(); // 存储选中项的key: "prob_xxx" / "sr_xxx" / "worry_xxx"
+
+    function renderAdminPanel(tab) {
+        const container = document.getElementById('adminListContainer');
+        if(!container) return;
+        let items = [];
+        if(tab === 'unreclaimed') {
+            problems.filter(p=>!p.reclaimed).forEach(p => items.push({ type: 'problem', id: p.id, role: p.role, content: p.content, subInfo: `❤️ ${p.likes} | 回复数:${p.replies?.length||0}`, raw: p }));
+            standaloneReplies.filter(r=>!r.reclaimed).forEach(r => items.push({ type: 'standaloneReply', id: r.id, role: r.role, content: r.content, subInfo: `❤️ ${r.likes}`, raw: r }));
+            worries.filter(w=>!w.reclaimed).forEach(w => items.push({ type: 'worry', id: w.id, role: '匿名', content: w.content, subInfo: `❤️ ${w.likes}`, raw: w }));
+        } else {
+            problems.filter(p=>p.reclaimed).forEach(p => items.push({ type: 'problem', id: p.id, role: p.role, content: p.content, subInfo: `❤️ ${p.likes} (已回收)`, raw: p }));
+            standaloneReplies.filter(r=>r.reclaimed).forEach(r => items.push({ type: 'standaloneReply', id: r.id, role: r.role, content: r.content, subInfo: `❤️ ${r.likes}`, raw: r }));
+            worries.filter(w=>w.reclaimed).forEach(w => items.push({ type: 'worry', id: w.id, role: '匿名', content: w.content, subInfo: `❤️ ${w.likes}`, raw: w }));
+        }
+        if(items.length === 0) { container.innerHTML = '<div style="padding:20px;text-align:center;">暂无留言</div>'; return; }
+        container.innerHTML = items.map(item => `
+            <div class="admin-item" data-select-key="${item.type}_${item.id}">
+                <div class="admin-item-info">
+                    <div class="admin-item-meta">📌 ${item.type==='problem'?'问题云':(item.type==='standaloneReply'?'回应云':'情绪云')} · 身份:${item.role} · ${item.subInfo}</div>
+                    <div class="admin-item-content">${escapeHtml(item.content.length > 80 ? item.content.slice(0,80)+'…' : item.content)}</div>
+                </div>
+                <div class="admin-item-actions">
+                    <input type="checkbox" class="admin-select-check" data-key="${item.type}_${item.id}" ${selectedItems.has(`${item.type}_${item.id}`) ? 'checked' : ''}>
+                    ${tab === 'unreclaimed' ? `<button class="reclaim-btn single-reclaim" data-key="${item.type}_${item.id}">🗑️ 回收</button>` : `<button class="restore-btn single-restore" data-key="${item.type}_${item.id}">🔄 恢复</button>`}
+                </div>
+            </div>
+        `).join('');
+        // 绑定单条操作
+        document.querySelectorAll('.single-reclaim').forEach(btn => btn.onclick = (e) => { e.stopPropagation(); const key = btn.getAttribute('data-key'); toggleReclaimByKey(key, true); });
+        document.querySelectorAll('.single-restore').forEach(btn => btn.onclick = (e) => { e.stopPropagation(); const key = btn.getAttribute('data-key'); toggleReclaimByKey(key, false); });
+        document.querySelectorAll('.admin-select-check').forEach(cb => cb.onchange = (e) => { const key = cb.getAttribute('data-key'); if(cb.checked) selectedItems.add(key); else selectedItems.delete(key); });
+    }
+
+    function toggleReclaimByKey(key, toReclaimed) {
+        let [type, id] = key.split('_');
+        if(type === 'problem') { let prob = problems.find(p=>p.id===id); if(prob) prob.reclaimed = toReclaimed; }
+        else if(type === 'standaloneReply') { let rep = standaloneReplies.find(r=>r.id===id); if(rep) rep.reclaimed = toReclaimed; }
+        else if(type === 'worry') { let wor = worries.find(w=>w.id===id); if(wor) wor.reclaimed = toReclaimed; }
+        saveAll();
+        // 刷新全部前台及后台面板
+        renderProblems(); renderStandaloneReplies(); renderWorries(); renderHotContent();
+        selectedItems.clear();
+        renderAdminPanel(currentAdminTab);
+    }
+
+    function batchReclaim() {
+        if(selectedItems.size === 0) { alert('请先勾选要回收的留言'); return; }
+        for(let key of selectedItems) {
+            let [type, id] = key.split('_');
+            if(type === 'problem') { let p = problems.find(p=>p.id===id); if(p && !p.reclaimed) p.reclaimed = true; }
+            else if(type === 'standaloneReply') { let r = standaloneReplies.find(r=>r.id===id); if(r && !r.reclaimed) r.reclaimed = true; }
+            else if(type === 'worry') { let w = worries.find(w=>w.id===id); if(w && !w.reclaimed) w.reclaimed = true; }
+        }
+        saveAll();
+        selectedItems.clear();
+        renderProblems(); renderStandaloneReplies(); renderWorries(); renderHotContent();
+        renderAdminPanel(currentAdminTab);
+        alert('已回收所选留言，前台已隐藏。');
+    }
+
+    function exportAllToCSV() {
+        let rows = [['类型','身份','内容','点赞数','是否已回收','回复详情(问题专用)']];
+        problems.forEach(p => { rows.push([ '问题云朵', p.role, p.content, p.likes, p.reclaimed ? '已回收' : '未回收', p.replies ? p.replies.map(r=>`[${r.role}]${r.content}`).join('; ') : '' ]); });
+        standaloneReplies.forEach(r => { rows.push([ '独立回应', r.role, r.content, r.likes, r.reclaimed ? '已回收' : '未回收', '' ]); });
+        worries.forEach(w => { rows.push([ '情绪释放', '匿名', w.content, w.likes, w.reclaimed ? '已回收' : '未回收', '' ]); });
+        let csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        let blob = new Blob(["\uFEFF" + csvContent], {type: 'text/csv;charset=utf-8;'});
+        let link = document.createElement('a');
+        let url = URL.createObjectURL(blob);
+        link.href = url; link.setAttribute('download','云间心语_全部留言.csv'); document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+    }
+
+    // 界面按钮
+    document.getElementById('submitQuestionBtn').onclick = () => { let role = document.getElementById('questionRole').value; let content = document.getElementById('questionContent').value; if(addQuestion(role, content)) document.getElementById('questionContent').value = ''; };
+    document.getElementById('submitStandaloneReplyBtn').onclick = () => { let role = document.getElementById('replyRole').value; let content = document.getElementById('replyContent').value; if(addStandaloneReply(role, content)) document.getElementById('replyContent').value = ''; };
+    document.getElementById('submitWorryBtn').onclick = () => { let content = document.getElementById('worryContent').value; if(addWorry(content)) document.getElementById('worryContent').value = ''; };
+
+    let teacherPanelVisible = false;
+    const panelDiv = document.getElementById('adminPanel');
+    document.getElementById('teacherPanelBtn').onclick = () => { let pwd = prompt('请输入教师管理密码（默认525心理健康）:'); if(pwd === '525') { teacherPanelVisible = !teacherPanelVisible; panelDiv.style.display = teacherPanelVisible ? 'block' : 'none'; if(teacherPanelVisible) renderAdminPanel(currentAdminTab); } else if(pwd !== null) alert('密码错误，无法进入回收站'); };
+    document.querySelectorAll('.tab-btn').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentAdminTab = btn.getAttribute('data-tab'); renderAdminPanel(currentAdminTab); }; });
+    document.getElementById('batchReclaimBtn').onclick = batchReclaim;
+    document.getElementById('exportAllBtn').onclick = exportAllToCSV;
+
+    loadData();
+    renderProblems(); renderStandaloneReplies(); renderWorries(); renderHotContent();
+</script>
+</body>
+</html>
